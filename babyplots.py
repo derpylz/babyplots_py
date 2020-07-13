@@ -1,5 +1,16 @@
-from IPython.display import HTML, Javascript, display
+import os
 from uuid import uuid4
+import json
+from IPython.display import HTML, Javascript, display
+import jinja2
+
+
+dirname = os.path.dirname(
+    os.path.realpath(__file__)
+)
+
+t_loader = jinja2.FileSystemLoader(os.path.join(dirname, 'templates'))
+JENV = jinja2.Environment(loader=t_loader)
 
 
 class Babyplot(object):
@@ -10,6 +21,18 @@ class Babyplot(object):
         self.width = width
         self.height = height
         self.background_color = background_color
+        bpjs_file = os.path.join(
+            dirname,
+            'js/babyplots.js'
+        )
+        with open(bpjs_file, 'r', encoding="utf8") as infile:
+            bpjs = infile.read()
+        display(Javascript(bpjs))
+        
+           
+    @staticmethod
+    def format_json(prop):
+        return json.dumps(prop)
 
     def addPlot(self, coordinates, plot_type, color_by, color_var, options):
         self.plots.append(
@@ -17,29 +40,17 @@ class Babyplot(object):
                 'coordinates': coordinates,
                 'plot_type': plot_type,
                 'color_by': color_by,
+                'color_var': color_var,
                 'options': options
             }
         )
 
+
     def _repr_html_(self):
-        id = uuid4()
-        return """<style>
-                    canvas#plot {{
-                        width: {bp.width};
-                        height: {bp.height};
-                        background-color: {bp.background_color};
-                    }}
-                    </style>
-                    <canvas id="plot_{id}"></canvas>
-                    <script>
-                    function display() {{
-                        var cnvs = document.getElementById("plot_{id}");
-                        var ctx = cnvs.getContext("2d");
-                        setInterval(function () {{
-                            ctx.clearRect(0, 0, 100, 100);
-                            ctx.fillStyle = "red";
-                            ctx.fillRect(Math.random() * 10, Math.random() * 10, Math.random() * 50, Math.random() * 50);
-                        }}, 100)
-                    }}
-                    display();
-                    </script>""".format(bp=self, id=id)
+        display_id = str(uuid4()).replace('-', '_')
+
+
+        html = JENV.get_template('plot.html')
+        output = html.render(baby=self, display_id=display_id)
+        # print(output)
+        return output
