@@ -1,0 +1,25 @@
+<style>
+canvas#{{ display_id }} {
+  width: {{ baby.width }}px;
+  height: {{ baby.height }}px;
+  background-color: {{ baby.background_color }}
+}
+</style>
+
+<canvas width="{{ baby.width }}" height="{{ baby.height }}" id="plot_{{ display_id }}"></canvas>
+
+
+<script>
+  require(['Baby'], function(Baby) {
+    function display_{{ display_id }}() {
+        var vis = new Baby.Plots("plot_{{ display_id }}", "{{ baby.background_color }}");
+        var coords = {{ baby.plots[0]["coordinates"]|tojson }};
+        var colorvar = {{ baby.plots[0]["color_var"]|tojson }};
+        vis.addPlot(coords, "{{ baby.plots[0]["plot_type"] }}", "{{ baby.plots[0]["color_by"] }}", colorvar, {{ baby.plots[0].options|tojson }});
+        vis.turntable = {{ baby.turntable|tojson }};
+        vis.rotationRate = {{ baby.rotation_rate }};
+        vis.doRender();
+    }
+    display_{{ display_id }}();
+  });
+</script>

@@ -14,24 +14,12 @@ JENV = jinja2.Environment(loader=t_loader)
 
 
 class Babyplot(object):
-    def __init__(self, width="640px", height="480px", background_color="#ffffffff"):
+    def __init__(self, width=640, height=480, background_color="#ffffffff", turntable=False, rotation_rate=0.01):
         self.plots = []
-        self.turntable = False
-        self.rotation_rate = 0.01
-        if type(width) == str:
-            if width.isdigit():
-                self.width = int(width)
-            elif width.endswith("px"):
-                self.width = int(width.rstrip("px"))
-            else:
-                raise ValueError("width should be either a pixel value")
-        if type(height) == str:
-            if height.isdigit():
-                self.height = int(height)
-            elif height.endswith("px"):
-                self.height = int(height.rstrip("px"))
-            else:
-                raise ValueError("height should be either a pixel value")
+        self.turntable = turntable
+        self.rotation_rate = rotation_rate
+        self.width = width
+        self.height = height
         self.background_color = background_color
         bpjs_file = os.path.join(
             dirname,
