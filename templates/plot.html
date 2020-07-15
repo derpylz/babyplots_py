@@ -1,12 +1,12 @@
 <style>
 canvas#{{ display_id }} {
-  width: {{ baby.width }};
-  height: {{ baby.height }};
+  width: {{ baby.width }}px;
+  height: {{ baby.height }}px;
   background-color: {{ baby.background_color }}
 }
 </style>
 
-<canvas id="plot_{{ display_id }}"></canvas>
+<canvas width="{{ baby.width }}" height="{{ baby.height }}" id="plot_{{ display_id }}"></canvas>
 
 
 <script>
