@@ -13,9 +13,15 @@ canvas#{{ display_id }} {
   require(['Baby'], function(Baby) {
     function display_{{ display_id }}() {
         var vis = new Baby.Plots("plot_{{ display_id }}", "{{ baby.background_color }}");
+        {% if is_plot %}
         var coords = {{ baby.plots[0]["coordinates"]|tojson }};
         var colorvar = {{ baby.plots[0]["color_var"]|tojson }};
         vis.addPlot(coords, "{{ baby.plots[0]["plot_type"] }}", "{{ baby.plots[0]["color_by"] }}", colorvar, {{ baby.plots[0].options|tojson }});
+        {% else %}
+        var values = {{ baby.plots[0]["values"]|tojson }};
+        var indices = {{ baby.plots[0]["indices"]|tojson }};
+        vis.addImgStack(values, indices, {{ baby.plots[0]["attributes"]|tojson }}, {{ baby.plots[0].options|tojson }})
+        {% endif %}
         vis.turntable = {{ baby.turntable|tojson }};
         vis.rotationRate = {{ baby.rotation_rate }};
         vis.doRender();
