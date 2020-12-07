@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+babyplots/__init__.py
+babyplots/babyplots.py
+babyplots/blebli.py
+babyplots.egg-info/PKG-INFO
+babyplots.egg-info/SOURCES.txt
+babyplots.egg-info/dependency_links.txt
+babyplots.egg-info/top_level.txt
+babyplots/js/CCapture.all.min.js
+babyplots/js/babyplots.js
+babyplots/js/babyplots.js.LICENSE.txt
+babyplots/js/babyplots.js.map
+babyplots/js/gif.worker.js
+babyplots/templates/plot.html

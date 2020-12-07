@@ -12,12 +12,30 @@ canvas#{{ display_id }} {
 <script>
   require(['Baby'], function(Baby) {
     function display_{{ display_id }}() {
-        var vis = new Baby.Plots("plot_{{ display_id }}", "{{ baby.background_color }}");
-        var coords = {{ baby.plots[0]["coordinates"]|tojson }};
-        var colorvar = {{ baby.plots[0]["color_var"]|tojson }};
-        vis.addPlot(coords, "{{ baby.plots[0]["plot_type"] }}", "{{ baby.plots[0]["color_by"] }}", colorvar, {{ baby.plots[0].options|tojson }});
-        vis.turntable = {{ baby.turntable|tojson }};
-        vis.rotationRate = {{ baby.rotation_rate }};
+        console.log("init");
+        var vis = new Baby.Plots("plot_{{ display_id }}", {
+          backgroundColor: "{{ baby.background_color }}",
+          turntable: {{ baby.turntable|tojson }},
+          rotationRate: {{ baby.rotation_rate }},
+          xScale: {{ baby.x_scale }},
+          yScale: {{ baby.y_scale }},
+          zScale: {{ baby.z_scale }},
+          shapeLegendTitle: "{{ baby.shape_legend_title }}"
+        });
+        {% for plot in baby.plots %}
+          {% if plot["plot_type"] == "imageStack" %}
+            var values = {{ plot["values"]|tojson }};
+            var indices = {{ plot["indices"]|tojson }};
+            vis.addImgStack(values, indices, {{ plot["attributes"]|tojson }}, {{ plot.options|tojson }})
+          {% else %}
+            var coords = {{ plot["coordinates"]|tojson }};
+            var colorvar = {{ plot["color_var"]|tojson }};
+            vis.addPlot(coords, "{{ plot["plot_type"] }}", "{{ plot["color_by"] }}", colorvar, {{ plot.options|tojson }});
+          {% endif %}
+        {% endfor %}
+        {% if baby.show_ui %}
+        vis.createButtons(["json", "label", "publish"]);
+        {% endif %}
         vis.doRender();
     }
     display_{{ display_id }}();

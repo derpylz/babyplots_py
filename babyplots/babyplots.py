@@ -18,13 +18,30 @@ JENV = jinja2.Environment(loader=t_loader)
 
 
 class Babyplot(object):
-    def __init__(self, width=640, height=480, background_color="#ffffffff", turntable=False, rotation_rate=0.01):
+    def __init__(
+        self,
+        width=640,
+        height=480,
+        background_color="#ffffffff",
+        turntable=False,
+        rotation_rate=0.01,
+        x_scale=1,
+        y_scale=1,
+        z_scale=1,
+        shape_legend_title="",
+        show_ui=False
+    ):
         self.plots = []
         self.turntable = turntable
         self.rotation_rate = rotation_rate
         self.width = width
         self.height = height
         self.background_color = background_color
+        self.x_scale = x_scale
+        self.y_scale = y_scale
+        self.z_scale = z_scale
+        self.shape_legend_title = shape_legend_title
+        self.show_ui = show_ui
         bpjs_file = os.path.join(
             dirname,
             'js/babyplots.js'
@@ -51,6 +68,7 @@ class Babyplot(object):
     def add_img_stack(self, values, indices, attributes, options={}):
         self.plots.append(
             {
+                'plot_type': "imageStack",
                 'values': values,
                 'indices': indices,
                 'attributes': attributes,
@@ -59,7 +77,7 @@ class Babyplot(object):
         )
 
     def add_tiff(self, image_path, threshold=0.1, channel_thresholds=None, options={}):
-        im = img_as_float(io.imread(image_path)) # im shape: z, x, y, c
+        im = img_as_float(io.imread(image_path))  # im shape: z, x, y, c
         # if image has no color channels, adjust dimensions
         if len(im.shape) == 3:
             im = np.expand_dims(im, axis=-1)
@@ -73,7 +91,7 @@ class Babyplot(object):
                 mask = im[:, :, :, i] < thres
                 im[:, :, :, i][mask] = 0
         # reorder dimensions to that flatten gives the same order as R equivalent
-        im = np.transpose(im, (0, 3, 2, 1)) # im shape becomes z, c, y, x
+        im = np.transpose(im, (0, 3, 2, 1))  # im shape becomes z, c, y, x
         # flatten
         n_vals = reduce(lambda x, y: x*y, im.shape)
         im = np.reshape(im, n_vals)
