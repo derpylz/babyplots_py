@@ -18,6 +18,11 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
+    install_requires=[
+        "scikit-image",
+        "ipython",
+        "jinja2"
+    ],
     python_requires='>=3.6',
     include_package_data=True
 )
