@@ -9,7 +9,7 @@ https://bp.bleb.li/documentation/python
 
 import os
 from functools import reduce
-from typing import Union
+from typing import Union, List
 from uuid import uuid4
 import json
 import numpy as np
@@ -105,10 +105,10 @@ class Babyplot(object):
 
     def add_plot(
             self,
-            coordinates: list[list[float]],
+            coordinates: List[List[float]],
             plot_type: str,
             color_by: str,
-            color_var: Union[list[float], list[str]],
+            color_var: Union[List[float], List[str]],
             options: dict = {}
     ):
         """Add a plot to the Babyplot object
@@ -142,8 +142,8 @@ class Babyplot(object):
 
     def add_img_stack(
             self,
-            values: list[float],
-            indices: list[float],
+            values: List[float],
+            indices: List[float],
             attributes: dict,
             options: dict = {}
     ):
@@ -182,7 +182,7 @@ class Babyplot(object):
         self,
         image_path: str,
         threshold: float = 0.1,
-        channel_thresholds: list[float] = None,
+        channel_thresholds: List[float] = None,
         options: dict = {}
     ):
         """Add a 3d image stack from a tiff file to the Babyplot object.
