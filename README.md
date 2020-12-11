@@ -76,6 +76,6 @@ Babyplots was created by [Nils Trost](http://nils.blebli.de)
 
 Released under the [Apache 2.0 License](LICENSE).
 
-Find the licenses of the included libraries [here](dist/babyplots.js.LICENSE.txt). Make sure to include this file if you use babyplots in your project.
+Find the licenses of the included libraries [here](babyplots/js/babyplots.js.LICENSE.txt). Make sure to include this file if you use babyplots in your project.
 
 
