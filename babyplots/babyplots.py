@@ -28,7 +28,7 @@ JENV = jinja2.Environment(loader=t_loader)
 
 
 class Babyplot(object):
-    """The Babyplot object stores the individual plots of the visualization and
+    """The Babyplot class stores the individual plots of the visualization and
     their options.
 
     The first step to create a babyplots visualization is to create a Babyplot
@@ -97,6 +97,8 @@ class Babyplot(object):
         )
         with open(bpjs_file, 'r', encoding="utf8") as infile:
             bpjs = infile.read()
+        bpjs = "define('Baby', [], function() {{{0} return Baby;}})".format(
+            bpjs)
         display(Javascript(bpjs))
 
     @staticmethod
@@ -234,7 +236,49 @@ class Babyplot(object):
         """Displays the babyplots visualization in a Jupyter Notebook."""
         display_id = str(uuid4()).replace('-', '_')
 
-        is_plot = "plot_type" in self.plots[0]
         html = JENV.get_template('plot.html')
-        output = html.render(baby=self, display_id=display_id, is_plot=is_plot)
+        output = html.render(baby=self, display_id=display_id)
         return output
+
+    def as_html(self, fullscreen: bool = False, title: str = "Babyplot") -> str:
+        """Returns the babyplots visualization as an html string.
+
+        Parameters
+        ---
+        title: Title of the html page.
+
+        """
+        display_id = str(uuid4()).replace('-', '_')
+        bpjs_file = os.path.join(
+            dirname,
+            'js/babyplots.js'
+        )
+        with open(bpjs_file, 'r', encoding="utf8") as infile:
+            bpjs = infile.read()
+        html = JENV.get_template('save_plot.html')
+        output = html.render(
+            baby=self,
+            display_id=display_id,
+            bpjs=bpjs,
+            vis_name=title,
+            fullscreen=fullscreen
+        )
+        return output
+
+    def save_as_html(
+        self,
+        path: str,
+        fullscreen: bool = False,
+        title: str = "Babyplot"
+    ):
+        """Save the babyplots visualization as an html file.
+
+        Parameters
+        ---
+        path: Filepath for the output.
+
+        title: Title of the html page.
+
+        """
+        with open(path, "w", encoding="utf-8") as outfile:
+            outfile.write(self.as_html(fullscreen, title))
