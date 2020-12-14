@@ -95,9 +95,9 @@ class Babyplot(object):
             dirname,
             'js/babyplots.js'
         )
-        with open(bpjs_file, 'r', encoding="utf8") as infile:
+        with open(bpjs_file, 'r', encoding="utf-8") as infile:
             bpjs = infile.read()
-        bpjs = "define('Baby', [], function() {{{0} return Baby;}})".format(
+        bpjs = "define('Baby', [], function() {{{0}\nreturn Baby;}})".format(
             bpjs)
         display(Javascript(bpjs))
 
@@ -253,7 +253,7 @@ class Babyplot(object):
             dirname,
             'js/babyplots.js'
         )
-        with open(bpjs_file, 'r', encoding="utf8") as infile:
+        with open(bpjs_file, 'r', encoding="utf-8") as infile:
             bpjs = infile.read()
         html = JENV.get_template('save_plot.html')
         output = html.render(

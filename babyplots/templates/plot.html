@@ -12,7 +12,6 @@ canvas#{{ display_id }} {
 <script>
   require(['Baby'], function(Baby) {
     function display_{{ display_id }}() {
-        console.log("init");
         var vis = new Baby.Plots("plot_{{ display_id }}", {
           backgroundColor: "{{ baby.background_color }}",
           turntable: {{ baby.turntable|tojson }},
@@ -34,6 +33,7 @@ canvas#{{ display_id }} {
           {% endif %}
         {% endfor %}
         {% if baby.show_ui %}
+        vis.Python = true;
         vis.createButtons(["json", "label", "publish"]);
         {% endif %}
         vis.doRender();

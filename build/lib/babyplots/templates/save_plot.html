@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ vis_name }}</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            {% if fullscreen %}
+                overflow: hidden;
+            {% endif %}
+        }
+        canvas#{{ display_id }} {
+            {% if fullscreen %}
+                width: 100%;
+                height 100%;
+            {% else %}
+                width: {{ baby.width }}px;
+                height: {{ baby.height }}px;
+            {% endif %}
+            background-color: {{ baby.background_color }}
+        }
+    </style>
+    <script>{{ bpjs }}</script>
+</head>
+<body>
+    
+    {% if fullscreen %}
+    <canvas id="plot_{{ display_id }}"></canvas>
+    {% else %}
+    <canvas width="{{ baby.width }}" height="{{ baby.height }}" id="plot_{{ display_id }}"></canvas>
+    {% endif %}
+    
+    <script>
+        {% if fullscreen %}
+            var cnvs = document.getElementById("plot_{{ display_id }}");
+            cnvs.width = window.innerWidth;
+            cnvs.height = window.innerHeight;
+        {% endif %}
+        var vis = new Baby.Plots("plot_{{ display_id }}", {
+            backgroundColor: "{{ baby.background_color }}",
+            turntable: {{ baby.turntable|tojson }},
+            rotationRate: {{ baby.rotation_rate }},
+            xScale: {{ baby.x_scale }},
+            yScale: {{ baby.y_scale }},
+            zScale: {{ baby.z_scale }},
+            shapeLegendTitle: "{{ baby.shape_legend_title }}"
+        });
+        {% for plot in baby.plots %}
+            {% if plot["plot_type"] == "imageStack" %}
+            var values = {{ plot["values"]|tojson }};
+            var indices = {{ plot["indices"]|tojson }};
+            vis.addImgStack(values, indices, {{ plot["attributes"]|tojson }}, {{ plot.options|tojson }})
+            {% else %}
+            var coords = {{ plot["coordinates"]|tojson }};
+            var colorvar = {{ plot["color_var"]|tojson }};
+            vis.addPlot(coords, "{{ plot["plot_type"] }}", "{{ plot["color_by"] }}", colorvar, {{ plot.options|tojson }});
+            {% endif %}
+        {% endfor %}
+        vis.doRender();
+        {% if baby.show_ui %}
+            vis.createButtons(["json", "label", "publish"]);
+        {% endif %}
+        window.addEventListener("resize", function () {
+            if (vis !== undefined) {
+                vis.resize()
+            }
+            {% if fullscreen %}
+                cnvs.width = window.innerWidth;
+                cnvs.height = window.innerHeight;
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

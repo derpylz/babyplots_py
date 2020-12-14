@@ -15,3 +15,4 @@ babyplots/js/babyplots.js.LICENSE.txt
 babyplots/js/babyplots.js.map
 babyplots/js/gif.worker.js
 babyplots/templates/plot.html
+babyplots/templates/save_plot.html

@@ -59,10 +59,10 @@
             vis.addPlot(coords, "{{ plot["plot_type"] }}", "{{ plot["color_by"] }}", colorvar, {{ plot.options|tojson }});
             {% endif %}
         {% endfor %}
+        vis.doRender();
         {% if baby.show_ui %}
             vis.createButtons(["json", "label", "publish"]);
         {% endif %}
-        vis.doRender();
         window.addEventListener("resize", function () {
             if (vis !== undefined) {
                 vis.resize()
