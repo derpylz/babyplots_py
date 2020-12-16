@@ -1,3 +1,4 @@
+{% if standalone %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +27,7 @@
     <script>{{ bpjs }}</script>
 </head>
 <body>
+{% endif %}
     
     {% if fullscreen %}
     <canvas id="plot_{{ display_id }}"></canvas>
@@ -73,5 +75,8 @@
             {% endif %}
         });
     </script>
+
+{% if standalone %}
 </body>
 </html>
+{% endif %}

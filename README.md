@@ -33,6 +33,7 @@ Below is a minimal example using the Iris data set:
 import numpy as np
 from sklearn import decomposition
 from sklearn import datasets
+from babyplots import Babyplot
 np.random.seed(5)
 
 iris = datasets.load_iris()

@@ -41,6 +41,7 @@ Description: # babyplots - Easy, fast, interactive 3D visualizations
         import numpy as np
         from sklearn import decomposition
         from sklearn import datasets
+        from babyplots import Babyplot
         np.random.seed(5)
         
         iris = datasets.load_iris()

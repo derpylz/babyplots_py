@@ -145,7 +145,7 @@ class Babyplot(object):
     def add_img_stack(
             self,
             values: List[float],
-            indices: List[float],
+            indices: List[int],
             attributes: dict,
             options: dict = {}
     ):
@@ -240,11 +240,22 @@ class Babyplot(object):
         output = html.render(baby=self, display_id=display_id)
         return output
 
-    def as_html(self, fullscreen: bool = False, title: str = "Babyplot") -> str:
+    def as_html(
+        self,
+        standalone: bool = True,
+        fullscreen: bool = False,
+        title: str = "Babyplot"
+    ) -> str:
         """Returns the babyplots visualization as an html string.
 
         Parameters
         ---
+        standalone: If True, the returned string is a complete html document,
+        if False, only the canvas and the plot data.
+
+        fullscreen: If set to True, the visualization will fill the viewport,
+        if not, it will conform to the dimensions set in the Babyplot object.
+
         title: Title of the html page.
 
         """
@@ -258,6 +269,7 @@ class Babyplot(object):
         html = JENV.get_template('save_plot.html')
         output = html.render(
             baby=self,
+            standalone=standalone,
             display_id=display_id,
             bpjs=bpjs,
             vis_name=title,
@@ -277,8 +289,11 @@ class Babyplot(object):
         ---
         path: Filepath for the output.
 
+        fullscreen: If set to True, the visualization will fill the viewport,
+        if not, it will conform to the dimensions set in the Babyplot object.
+
         title: Title of the html page.
 
         """
         with open(path, "w", encoding="utf-8") as outfile:
-            outfile.write(self.as_html(fullscreen, title))
+            outfile.write(self.as_html(True, fullscreen, title))
