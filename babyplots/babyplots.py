@@ -142,9 +142,38 @@ class Babyplot(object):
             }
         )
 
+    def add_mesh_stream(
+        self,
+        root_url: str,
+        file_prefix: str,
+        file_suffix: str,
+        file_iterator_start: int,
+        file_iterator_end: int,
+        frame_delay: int,
+        options: dict = {}
+        
+    ):
+        """Add a mesh stream visualization to the Babyplots object.
+
+
+
+        """
+        self.plots.append(
+            {
+                'plot_type': "meshStream",
+                'root_url': root_url,
+                'file_prefix': file_prefix,
+                'file_suffix': file_suffix,
+                'file_iterator_start': file_iterator_start,
+                'file_iterator_end': file_iterator_end,
+                'frame_delay': frame_delay,
+                'options': options
+            }
+        )
+
     def add_img_stack(
             self,
-            values: List[float],
+            vals: List[float],
             indices: List[int],
             attributes: dict,
             options: dict = {}
@@ -156,7 +185,7 @@ class Babyplot(object):
 
         Parameters
         ---
-        values: A list of pixel intensities at the image pixels given by the
+        vals: A list of pixel intensities at the image pixels given by the
         indices parameter.
 
         indices: A list of indices of included pixels. Used to reconstruct the
@@ -173,7 +202,7 @@ class Babyplot(object):
         self.plots.append(
             {
                 'plot_type': "imageStack",
-                'values': values,
+                'vals': vals,
                 'indices': indices,
                 'attributes': attributes,
                 'options': options

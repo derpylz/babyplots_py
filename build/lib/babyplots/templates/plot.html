@@ -21,19 +21,35 @@ canvas#{{ display_id }} {
           zScale: {{ baby.z_scale }},
           shapeLegendTitle: "{{ baby.shape_legend_title }}"
         });
+        vis.Python = true;
         {% for plot in baby.plots %}
-          {% if plot["plot_type"] == "imageStack" %}
-            var values = {{ plot["values"]|tojson }};
-            var indices = {{ plot["indices"]|tojson }};
-            vis.addImgStack(values, indices, {{ plot["attributes"]|tojson }}, {{ plot.options|tojson }})
+          {% if plot.plot_type == "imageStack" %}
+            var values = {{ plot.vals|tojson }};
+            var indices = {{ plot.indices|tojson }};
+            vis.addImgStack(values, indices, {{ plot.attributes|tojson }}, {{ plot.options|tojson }});
+          {% elif plot.plot_type == "meshStream" %}
+            var rootUrl = {{ plot.root_url|tojson }};
+            var filePrefix = {{ plot.file_prefix|tojson }};
+            var fileSuffix = {{ plot.file_suffix|tojson }};
+            var fileIteratorStart = {{ plot.file_iterator_start|tojson }};
+            var fileIteratorEnd = {{ plot.file_iterator_end|tojson }};
+            var frameDelay = {{ plot.frame_delay|tojson }};
+            vis.addMeshStream(
+              rootUrl,
+              filePrefix,
+              fileSuffix,
+              fileIteratorStart,
+              fileIteratorEnd,
+              frameDelay,
+              {{ plot.options|tojson }}
+            );
           {% else %}
-            var coords = {{ plot["coordinates"]|tojson }};
-            var colorvar = {{ plot["color_var"]|tojson }};
-            vis.addPlot(coords, "{{ plot["plot_type"] }}", "{{ plot["color_by"] }}", colorvar, {{ plot.options|tojson }});
+            var coords = {{ plot.coordinates|tojson }};
+            var colorvar = {{ plot.color_var|tojson }};
+            vis.addPlot(coords, "{{ plot.plot_type }}", "{{ plot.color_by }}", colorvar, {{ plot.options|tojson }});
           {% endif %}
         {% endfor %}
         {% if baby.show_ui %}
-        vis.Python = true;
         vis.createButtons(["json", "label", "publish"]);
         {% endif %}
         vis.doRender();
