@@ -61,10 +61,17 @@ For the complete documentation of babyplots and its python API, please visit [ht
 
 Join our [Discord server](https://discord.gg/bbWxP8q)!
 
+## Support the work on babyplots
+
+Using babyplots will always be free for everybody. But if you really like it and want to show your appreciation, you may buy us a coffee :)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/D1D45DB4K)
+
 ## Also see:
 
 Libraries used in babyplots:
 
+* [babyplots_lib](https://github.com/derpylz/babyplots), the underlying javascript library
 * [Babylon.js](https://www.babylonjs.com/), the rendering engine
 * [Chroma.js](https://gka.github.io/chroma.js/), the color conversion library
 * [CCapture.js](https://github.com/spite/ccapture.js/), for capturing gifs
