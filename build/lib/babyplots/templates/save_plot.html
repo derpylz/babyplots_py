@@ -48,18 +48,35 @@
             xScale: {{ baby.x_scale }},
             yScale: {{ baby.y_scale }},
             zScale: {{ baby.z_scale }},
-            shapeLegendTitle: "{{ baby.shape_legend_title }}"
+            shapeLegendTitle: "{{ baby.shape_legend_title }}",
+            upAxis: {{ baby.upAxis|tojson }}
         });
         {% for plot in baby.plots %}
-            {% if plot["plot_type"] == "imageStack" %}
-            var values = {{ plot["values"]|tojson }};
-            var indices = {{ plot["indices"]|tojson }};
-            vis.addImgStack(values, indices, {{ plot["attributes"]|tojson }}, {{ plot.options|tojson }})
-            {% else %}
-            var coords = {{ plot["coordinates"]|tojson }};
-            var colorvar = {{ plot["color_var"]|tojson }};
-            vis.addPlot(coords, "{{ plot["plot_type"] }}", "{{ plot["color_by"] }}", colorvar, {{ plot.options|tojson }});
-            {% endif %}
+          {% if plot.plotType == "imageStack" %}
+            var values = {{ plot.vals|tojson }};
+            var indices = {{ plot.indices|tojson }};
+            vis.addImgStack(values, indices, {{ plot.attributes|tojson }}, {{ plot.options|tojson }});
+          {% elif plot.plotType == "meshStream" %}
+            var rootUrl = {{ plot.rootUrl|tojson }};
+            var filePrefix = {{ plot.filePrefix|tojson }};
+            var fileSuffix = {{ plot.fileSuffix|tojson }};
+            var fileIteratorStart = {{ plot.fileIteratorStart|tojson }};
+            var fileIteratorEnd = {{ plot.fileIteratorEnd|tojson }};
+            var frameDelay = {{ plot.frameDelay|tojson }};
+            vis.addMeshStream(
+              rootUrl,
+              filePrefix,
+              fileSuffix,
+              fileIteratorStart,
+              fileIteratorEnd,
+              frameDelay,
+              {{ plot.options|tojson }}
+            );
+          {% else %}
+            var coords = {{ plot.coordinates|tojson }};
+            var colorvar = {{ plot.colorVar|tojson }};
+            vis.addPlot(coords, "{{ plot.plotType }}", "{{ plot.colorBy }}", colorvar, {{ plot.options|tojson }});
+          {% endif %}
         {% endfor %}
         vis.doRender();
         {% if baby.show_ui %}

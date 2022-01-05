@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="babyplots",
-    version="1.2.2",
+    version="1.3.1",
     author="Nils Trost",
     author_email="nils.trost@hotmail.de",
     description="Python package that allows the use of babyplots visualizations in jupyter notebooks",
@@ -21,7 +21,8 @@ setuptools.setup(
     install_requires=[
         "scikit-image",
         "ipython",
-        "jinja2"
+        "jinja2",
+        "pandas"
     ],
     python_requires='>=3.6',
     include_package_data=True

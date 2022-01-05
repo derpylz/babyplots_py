@@ -13,6 +13,7 @@ from typing import Union, List
 from uuid import uuid4
 import json
 import numpy as np
+import pandas as pd
 from skimage import io
 from skimage.util import img_as_float
 from IPython.display import HTML, Javascript, display
@@ -47,7 +48,8 @@ class Babyplot(object):
         y_scale: float = 1,
         z_scale: float = 1,
         shape_legend_title: str = "",
-        show_ui: bool = False
+        show_ui: bool = False,
+        up_axis: bool = False
     ):
         """
         Parameters
@@ -79,6 +81,9 @@ class Babyplot(object):
         annotating the plot with labels, exporting the plot as a .json file and
         publishing the plot to https://bp.bleb.li.
 
+        upAxis: Sets the camera up vector;
+        Either "+x", "-x", "+y", "-y", "+z", or "-z" (Default: "+y").
+
         """
         self.plots = []
         self.turntable = turntable
@@ -91,6 +96,7 @@ class Babyplot(object):
         self.z_scale = z_scale
         self.shape_legend_title = shape_legend_title
         self.show_ui = show_ui
+        self.upAxis = up_axis
         bpjs_file = os.path.join(
             dirname,
             'js/babyplots.js'
@@ -100,10 +106,6 @@ class Babyplot(object):
         bpjs = "define('Baby', [], function() {{{0}\nreturn Baby;}})".format(
             bpjs)
         display(Javascript(bpjs))
-
-    @staticmethod
-    def format_json(prop: any) -> str:
-        return json.dumps(prop)
 
     def add_plot(
             self,
@@ -117,7 +119,7 @@ class Babyplot(object):
 
         Parameters
         ---
-        coordinates: The coordinates of the data points.
+        coordinates: The coordinates of the data points (list or numpy ndarray).
 
         plot_tyes: Either "pointCloud", "shapeCloud", "heatMap", or "surface".
 
@@ -125,19 +127,84 @@ class Babyplot(object):
 
         color_var: The variable to use for coloring the data points; Either a
         list of discrete categories, numerical values, or colors in hex format
-        (e.g. "#ff0000").
+        (e.g. "#ff0000"); (list or numpy ndarray).
 
         options: A dictionary of plot options. Please refer to the
         documentation (https://bp.bleb.li/documentation/python") for a complete
         list of possible options.
 
         """
+        if isinstance(coordinates, np.ndarray):
+            coordinates = coordinates.tolist()
+        
+        if isinstance(color_var, np.ndarray):
+            color_var = color_var.tolist()
+
         self.plots.append(
             {
                 'coordinates': coordinates,
-                'plot_type': plot_type,
-                'color_by': color_by,
-                'color_var': color_var,
+                'plotType': plot_type,
+                'colorBy': color_by,
+                'colorVar': color_var,
+                'options': options
+            }
+        )
+
+    def add_plot_from_dataframe(
+        self,
+        dataframe: pd.DataFrame,
+        plot_type: str,
+        color_by: str,
+        color_var: Union[List[float], List[str], str],
+        coord_columns: List[str] = [],
+        options: dict = {}
+    ):
+        """Add a plot to the Babyplot object from a pandas dataframe.
+
+        The dataframe can either contain the coordinates and a column for the
+        color variable, or just the coordinates. If the dataframe contains the
+        color variable, the color_var parameter must be a string with the name
+        of the color variable column. Otherwise, the color_var parameters must
+        be the list of color variables (as in the add_plot method).
+
+        Parameters
+        ---
+        dataframe: The pandas dataframe from which to take the coordinates for
+        the plot and optionally a column for the color variable.
+
+        plot_tyes: Either "pointCloud", "shapeCloud", "heatMap", or "surface".
+
+        color_by: Either "categories", "values", or "direct".
+
+        color_var: Either the name of the column of the dataframe that contains
+        the variable to use for coloring, or the variable to use for coloring
+        the data points itself; In the second case, either a list of discrete
+        categories, numerical values, or colors in hex format (e.g. "#ff0000").
+
+        coord_columns: If the dataframe contains more columns than those for
+        the coordinates and the color variable, the coord_columns parameter
+        must be a list with the column names that contain the coordinates for
+        the plot.
+
+        options: A dictionary of plot options. Please refer to the
+        documentation (https://bp.bleb.li/documentation/python") for a complete
+        list of possible options.
+
+        """
+        dataframe = dataframe.copy()
+        if isinstance(color_var, str):
+            if color_var not in dataframe.columns:
+                raise KeyError(
+                    "color_var '{}' not in dataframe columns.".format(color_var))
+            color_var = dataframe.pop(color_var).values.tolist()
+        if coord_columns:
+            dataframe = dataframe[coord_columns]
+        self.plots.append(
+            {
+                'coordinates': dataframe.values.tolist(),
+                'plotType': plot_type,
+                'colorBy': color_by,
+                'colorVar': color_var,
                 'options': options
             }
         )
@@ -151,7 +218,7 @@ class Babyplot(object):
         file_iterator_end: int,
         frame_delay: int,
         options: dict = {}
-        
+
     ):
         """Add a mesh stream visualization to the Babyplots object.
 
@@ -160,13 +227,13 @@ class Babyplot(object):
         """
         self.plots.append(
             {
-                'plot_type': "meshStream",
-                'root_url': root_url,
-                'file_prefix': file_prefix,
-                'file_suffix': file_suffix,
-                'file_iterator_start': file_iterator_start,
-                'file_iterator_end': file_iterator_end,
-                'frame_delay': frame_delay,
+                'plotType': "meshStream",
+                'rootUrl': root_url,
+                'filePrefix': file_prefix,
+                'fileSuffix': file_suffix,
+                'fileIteratorStart': file_iterator_start,
+                'fileIteratorEnd': file_iterator_end,
+                'frameDelay': frame_delay,
                 'options': options
             }
         )
@@ -201,7 +268,7 @@ class Babyplot(object):
         """
         self.plots.append(
             {
-                'plot_type': "imageStack",
+                'plotType': "imageStack",
                 'vals': vals,
                 'indices': indices,
                 'attributes': attributes,
@@ -326,3 +393,130 @@ class Babyplot(object):
         """
         with open(path, "w", encoding="utf-8") as outfile:
             outfile.write(self.as_html(True, fullscreen, title))
+
+    def _to_dict(self):
+        d = {
+            "turntable": self.turntable,
+            "rotationRate": self.rotation_rate,
+            "backgroundColor": self.background_color,
+            "xScale": self.x_scale,
+            "yScale": self.y_scale,
+            "zScale": self.z_scale,
+            "shapeLegendTitle": self.shape_legend_title,
+            "upAxis": self.upAxis,
+            "plots": []
+        }
+
+        for plot in self.plots:
+            if plot["plotType"] == "imageStack":
+                d["plots"].append({
+                    "plotType": "imageStack",
+                    "values": plot["values"],
+                    "indices": plot["indices"],
+                    "attributes": ["attributes"],
+                    "size": plot["options"].get("size", 1),
+                    "colorScale": plot["options"].get("colorScale", None),
+                    "showLegend": plot["options"].get("showLegend", False),
+                    "fontSize": plot["options"].get("fontSize", 11),
+                    "fontColor": plot["options"].get("fontColor", "black"),
+                    "legendTitle": plot["options"].get(
+                        "legendTitle", None),
+                    "legendTitleFontSize": plot["options"].get(
+                        "legendTitleFontSize", 16),
+                    "legendTitleFontColor": plot["options"].get(
+                        "legendTitleFontColor", "black"),
+                    "legendPosition": plot["options"].get(
+                        "legendPosition", None),
+                    "showAxes": plot["options"].get(
+                        "showAxes", [False, False, False]),
+                    "axisLabels": plot["options"].get(
+                        "axisLabels", ["X", "Y", "Z"]),
+                    "axisColors": plot["options"].get(
+                        "axisColors", ["#666666", "#666666", "#666666"]),
+                    "tickBreaks": plot["options"].get(
+                        "tickBreaks", [2, 2, 2]),
+                    "showTickLines": plot["options"].get(
+                        "showTickLines",
+                        [[False, False], [False, False], [False, False]]),
+                    "tickLineColors": plot["options"].get(
+                        "tickLineColors",
+                        [
+                            ["#aaaaaa", "#aaaaaa"],
+                            ["#aaaaaa", "#aaaaaa"],
+                            ["#aaaaaa", "#aaaaaa"]
+                        ]),
+                    "intensityMode": plot["options"].get(
+                        "intensityMode", "alpha"),
+                    "channelColors": plot["options"].get(
+                        "channelColors",
+                        ["#ff0000", "#00ff00", "#0000ff"]),
+                    "channelOpacities": [1, 1, 1]
+                })
+            elif plot["plotType"] == "meshStream":
+                d["plots"].append({
+                    "plotType": "meshStream",
+                    "rootUrl": plot["rootUrl"],
+                    "filePrefix": plot["filePrefix"],
+                    "fileSuffix": plot["fileSuffix"],
+                    "fileIteratorStart": plot["fileIteratorStart"],
+                    "fileIteratorEnd": plot["fileIteratorEnd"],
+                    "frameDelay": plot["frameDelay"],
+                    "meshRotation": plot["options"].get("meshRotation", [0, 0, 0]),
+                    "meshOffset": plot["options"].get("meshOffset", [0, 0, 0]),
+                    "clearCoat": plot["options"].get("clearCoat", False),
+                    "clearCoatIntensity": plot["options"].get("clearCoatIntensity", 1)
+                })
+            else:
+                d["plots"].append({
+                    "plotType": plot["plotType"],
+                    "coordinates": plot["coordinates"],
+                    "colorBy": plot["colorBy"],
+                    "colorVar": plot["colorVar"],
+                    "name": plot["options"].get("name", None),
+                    "size": plot["options"].get("size", 1),
+                    "colorScale": plot["options"].get("colorScale", "Oranges"),
+                    "customColorScale": plot["options"].get("customColorScale", []),
+                    "colorScaleInverted": plot["options"].get("colorScaleInverted", False),
+                    "sortedCategories": plot["options"].get("sortedCategories", []),
+                    "showLegend": plot["options"].get("showLegend", False),
+                    "fontSize": plot["options"].get("fontSize", 11),
+                    "fontColor": plot["options"].get("fontColor", "black"),
+                    "legendTitle": plot["options"].get("legendTitle", None),
+                    "legendTitleFontSize": plot["options"].get("legendTitleFontSize", 16),
+                    "legendTitleFontColor": plot["options"].get("legendTitleFontColor", "black"),
+                    "legendPosition": plot["options"].get("legendPosition", None),
+                    "legendShowShape": plot["options"].get("legendShowShape", False),
+                    "showAxes": plot["options"].get("showAxes", [False, False, False]),
+                    "axisLabels": plot["options"].get("axisLabels", ["X", "Y", "Z"]),
+                    "axisColors": plot["options"].get("axisColors", ["#666666", "#666666", "#666666"]),
+                    "tickBreaks": plot["options"].get("tickBreaks", [2, 2, 2]),
+                    "showTickLines": plot["options"].get("showTickLines", [[False, False], [False, False], [False, False]]),
+                    "tickLineColors": plot["options"].get("tickLineColors", [["#aaaaaa", "#aaaaaa"], ["#aaaaaa", "#aaaaaa"], ["#aaaaaa", "#aaaaaa"]]),
+                    "hasAnimation": plot["options"].get("hasAnimation", False),
+                    "animationTargets": plot["options"].get("animationTargets", None),
+                    "animationDelay": plot["options"].get("animationDelay", None),
+                    "animationDuration": plot["options"].get("animationDuration", None),
+                    "animationLoop": plot["options"].get("animationLoop", False),
+                    "colnames": plot["options"].get("colnames", None),
+                    "rownames": plot["options"].get("rownames", None),
+                    "shape": plot["options"].get("shape", None),
+                    "shading": plot["options"].get("shading", True),
+                    "dpInfo": plot["options"].get("dpInfo", None),
+                    "addClusterLabels": plot["options"].get("addClusterLabels", False)
+                })
+
+        return d
+
+    def as_json(self):
+        """Returns the babyplots visualization as a json formatted string."""
+        return json.dumps(self._to_dict())
+
+    def save_as_json(self, path: str):
+        """Saves the babyplots visualization as a json file.
+
+        Parameters
+        ---
+        path: Filepath for the output.
+        """
+        with open(path, "w", encoding="utf-8") as outfile:
+            json.dump(self._to_dict(), outfile)

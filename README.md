@@ -46,7 +46,7 @@ y = iris.target
 
 bp_iris = Babyplot(background_color="#262626ff")
 
-bp_iris.add_plot(X.tolist(), "shapeCloud", "categories", y.tolist(), {"shape": "sphere", "colorScale": "Set2", "showAxes": [True, True, True], "axisLabels": ["PC 1", "PC 2", "PC 3"]})
+bp_iris.add_plot(X, "shapeCloud", "categories", y, {"shape": "sphere", "colorScale": "Set2", "showAxes": [True, True, True], "axisLabels": ["PC 1", "PC 2", "PC 3"]})
 
 bp_iris
 ```
