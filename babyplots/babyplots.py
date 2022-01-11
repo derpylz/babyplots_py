@@ -81,7 +81,7 @@ class Babyplot(object):
         annotating the plot with labels, exporting the plot as a .json file and
         publishing the plot to https://bp.bleb.li.
 
-        upAxis: Sets the camera up vector;
+        up_axis: Sets the camera up vector;
         Either "+x", "-x", "+y", "-y", "+z", or "-z" (Default: "+y").
 
         """
@@ -136,7 +136,7 @@ class Babyplot(object):
         """
         if isinstance(coordinates, np.ndarray):
             coordinates = coordinates.tolist()
-        
+
         if isinstance(color_var, np.ndarray):
             color_var = color_var.tolist()
 
@@ -238,12 +238,39 @@ class Babyplot(object):
             }
         )
 
+    def add_mesh_object(
+        self,
+        filepath: str,
+        options: dict = {}
+    ):
+        """Add a 3D model or scene of 3D models from a glTF file to the Babyplots object.
+
+        Parameters
+        ---
+        filepath: File path of the glTF file.
+
+        options: A dictionary of visualization options. Please refer to the
+        documentation (https://bp.bleb.li/documentation/python") for a complete
+        list of possible options.
+        """
+
+        with open(filepath, "r") as infile:
+            meshString = infile.read()
+
+        self.plots.append(
+            {
+                'plotType': "meshObject",
+                'meshString': meshString,
+                'options': options
+            }
+        )
+
     def add_img_stack(
-            self,
-            vals: List[float],
-            indices: List[int],
-            attributes: dict,
-            options: dict = {}
+        self,
+        vals: List[float],
+        indices: List[int],
+        attributes: dict,
+        options: dict = {}
     ):
         """Add an image stack visualization to the Babyplot object.
 
@@ -465,6 +492,28 @@ class Babyplot(object):
                     "meshOffset": plot["options"].get("meshOffset", [0, 0, 0]),
                     "clearCoat": plot["options"].get("clearCoat", False),
                     "clearCoatIntensity": plot["options"].get("clearCoatIntensity", 1)
+                })
+            elif plot["plotType"] == "meshObject":
+                d["plots"].append({
+                    "plotType": "meshObject",
+                    "meshString": plot["meshString"],
+                    "meshScaling": plot["options"].get("meshScaling", [1, 1, 1]),
+                    "meshRotation": plot["options"].get("meshRotation", [1, 1, 1]),
+                    "meshOffset": plot["options"].get("meshOffset", [1, 1, 1]),
+                    "showLegend": plot["options"].get("showLegend", False),
+                    "fontSize": plot["options"].get("fontSize", 11),
+                    "fontColor": plot["options"].get("fontColor", "black"),
+                    "legendTitle": plot["options"].get("legendTitle", None),
+                    "legendTitleFontSize": plot["options"].get("legendTitleFontSize", 16),
+                    "legendTitleFontColor": plot["options"].get("legendTitleFontColor", "black"),
+                    "legendPosition": plot["options"].get("legendPosition", None),
+                    "legendShowShape": plot["options"].get("legendShowShape", False),
+                    "showAxes": plot["options"].get("showAxes", [False, False, False]),
+                    "axisLabels": plot["options"].get("axisLabels", ["X", "Y", "Z"]),
+                    "axisColors": plot["options"].get("axisColors", ["#666666", "#666666", "#666666"]),
+                    "tickBreaks": plot["options"].get("tickBreaks", [2, 2, 2]),
+                    "showTickLines": plot["options"].get("showTickLines", [[False, False], [False, False], [False, False]]),
+                    "tickLineColors": plot["options"].get("tickLineColors", [["#aaaaaa", "#aaaaaa"], ["#aaaaaa", "#aaaaaa"], ["#aaaaaa", "#aaaaaa"]])
                 })
             else:
                 d["plots"].append({

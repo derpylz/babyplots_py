@@ -72,6 +72,12 @@
               frameDelay,
               {{ plot.options|tojson }}
             );
+          {% elif plot.plotType == "meshObject" %}
+            var meshString = {{ plot.meshString|tojson }};
+            vis.addMeshObject(
+              meshString,
+              {{ plot.options|tojson }}
+            );
           {% else %}
             var coords = {{ plot.coordinates|tojson }};
             var colorvar = {{ plot.colorVar|tojson }};
