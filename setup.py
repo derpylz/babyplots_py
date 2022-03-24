@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="babyplots",
-    version="1.4.0",
+    version="1.5.0",
     author="Nils Trost",
     author_email="nils.trost@hotmail.de",
     description="Python package that allows the use of babyplots visualizations in jupyter notebooks",

@@ -46,10 +46,12 @@ canvas#{{ display_id }} {
             );
           {% elif plot.plotType == "meshObject" %}
             var meshString = {{ plot.meshString|tojson }};
+            console.log(meshString)
             vis.addMeshObject(
               meshString,
               {{ plot.options|tojson }}
             );
+            console.log(vis)
           {% else %}
             var coords = {{ plot.coordinates|tojson }};
             var colorvar = {{ plot.colorVar|tojson }};

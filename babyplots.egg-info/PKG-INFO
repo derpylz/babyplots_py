@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: babyplots
-Version: 1.4.0
+Version: 1.5.0
 Summary: Python package that allows the use of babyplots visualizations in jupyter notebooks
 Home-page: https://github.com/derpylz/babyplots_py
 Author: Nils Trost
