@@ -18,6 +18,7 @@ from skimage import io
 from skimage.util import img_as_float
 from IPython.display import HTML, Javascript, display
 import jinja2
+from is_notebook import is_notebook
 
 
 dirname = os.path.dirname(
@@ -356,6 +357,21 @@ class Babyplot(object):
         idcs = idcs.tolist()
 
         self.add_img_stack(im, idcs, attributes, options)
+
+    def __repr__(self) -> str:
+        """If not running in a notebook, create a window with the babyplots visualization."""
+        if is_notebook():
+            return self._repr_html_
+        import webview
+        
+        display_id = str(uuid4()).replace('-', '_')
+
+        html = JENV.get_template('plot.html')
+        output = html.render(baby=self, display_id=display_id)
+
+        webview.create_window("babyplots", output)
+        webview.start(gui="qt")
+        return "<babyplots visualization with {} plot(s)>".format(len(self.plots))
 
     def _repr_html_(self):
         """Displays the babyplots visualization in a Jupyter Notebook."""
