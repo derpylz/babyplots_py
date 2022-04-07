@@ -18,7 +18,8 @@ from skimage import io
 from skimage.util import img_as_float
 from IPython.display import HTML, Javascript, display
 import jinja2
-from is_notebook import is_notebook
+
+from babyplots.utils.is_notebook import is_notebook
 
 
 dirname = os.path.dirname(
@@ -98,15 +99,17 @@ class Babyplot(object):
         self.shape_legend_title = shape_legend_title
         self.show_ui = show_ui
         self.upAxis = up_axis
-        bpjs_file = os.path.join(
-            dirname,
-            'js/babyplots.js'
-        )
-        with open(bpjs_file, 'r', encoding="utf-8") as infile:
-            bpjs = infile.read()
-        bpjs = "define('Baby', [], function() {{{0}\nreturn Baby;}})".format(
-            bpjs)
-        display(Javascript(bpjs))
+
+        if is_notebook():
+            bpjs_file = os.path.join(
+                dirname,
+                'js/babyplots.js'
+            )
+            with open(bpjs_file, 'r', encoding="utf-8") as infile:
+                bpjs = infile.read()
+            bpjs = "define('Baby', [], function() {{{0}\nreturn Baby;}})".format(
+                bpjs)
+            display(Javascript(bpjs))
 
     def add_plot(
             self,
@@ -360,16 +363,11 @@ class Babyplot(object):
 
     def __repr__(self) -> str:
         """If not running in a notebook, create a window with the babyplots visualization."""
-        if is_notebook():
-            return self._repr_html_
         import webview
         
-        display_id = str(uuid4()).replace('-', '_')
+        output = self.as_html(standalone=True)
 
-        html = JENV.get_template('plot.html')
-        output = html.render(baby=self, display_id=display_id)
-
-        webview.create_window("babyplots", output)
+        webview.create_window("babyplots", html=output)
         webview.start(gui="qt")
         return "<babyplots visualization with {} plot(s)>".format(len(self.plots))
 
