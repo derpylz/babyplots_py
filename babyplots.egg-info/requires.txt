@@ -1,0 +1,4 @@
+scikit-image
+ipython
+jinja2
+pandas

@@ -22,8 +22,7 @@ setuptools.setup(
         "scikit-image",
         "ipython",
         "jinja2",
-        "pandas",
-        "pywebview[qt]"
+        "pandas"
     ],
     python_requires='>=3.6',
     include_package_data=True

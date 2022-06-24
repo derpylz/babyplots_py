@@ -1,0 +1,68 @@
+<style>
+canvas#{{ display_id }} {
+  width: {{ baby.width }}px;
+  height: {{ baby.height }}px;
+  background-color: {{ baby.background_color }}
+}
+</style>
+
+<canvas width="{{ baby.width }}" height="{{ baby.height }}" id="plot_{{ display_id }}"></canvas>
+
+
+<script>
+  require(['Baby'], function(Baby) {
+    function display_{{ display_id }}() {
+        var vis = new Baby.Plots("plot_{{ display_id }}", {
+          backgroundColor: "{{ baby.background_color }}",
+          turntable: {{ baby.turntable|tojson }},
+          rotationRate: {{ baby.rotation_rate }},
+          xScale: {{ baby.x_scale }},
+          yScale: {{ baby.y_scale }},
+          zScale: {{ baby.z_scale }},
+          shapeLegendTitle: "{{ baby.shape_legend_title }}",
+          upAxis: {{ baby.upAxis|tojson }}
+        });
+        vis.Python = true;
+        {% for plot in baby.plots %}
+          {% if plot.plotType == "imageStack" %}
+            var values = {{ plot.vals|tojson }};
+            var indices = {{ plot.indices|tojson }};
+            vis.addImgStack(values, indices, {{ plot.attributes|tojson }}, {{ plot.options|tojson }});
+          {% elif plot.plotType == "meshStream" %}
+            var rootUrl = {{ plot.rootUrl|tojson }};
+            var filePrefix = {{ plot.filePrefix|tojson }};
+            var fileSuffix = {{ plot.fileSuffix|tojson }};
+            var fileIteratorStart = {{ plot.fileIteratorStart|tojson }};
+            var fileIteratorEnd = {{ plot.fileIteratorEnd|tojson }};
+            var frameDelay = {{ plot.frameDelay|tojson }};
+            vis.addMeshStream(
+              rootUrl,
+              filePrefix,
+              fileSuffix,
+              fileIteratorStart,
+              fileIteratorEnd,
+              frameDelay,
+              {{ plot.options|tojson }}
+            );
+          {% elif plot.plotType == "meshObject" %}
+            var meshString = {{ plot.meshString|tojson }};
+            console.log(meshString)
+            vis.addMeshObject(
+              meshString,
+              {{ plot.options|tojson }}
+            );
+            console.log(vis)
+          {% else %}
+            var coords = {{ plot.coordinates|tojson }};
+            var colorvar = {{ plot.colorVar|tojson }};
+            vis.addPlot(coords, "{{ plot.plotType }}", "{{ plot.colorBy }}", colorvar, {{ plot.options|tojson }});
+          {% endif %}
+        {% endfor %}
+        {% if baby.show_ui %}
+        vis.createButtons(["json", "label", "publish"]);
+        {% endif %}
+        vis.doRender();
+    }
+    display_{{ display_id }}();
+  });
+</script>

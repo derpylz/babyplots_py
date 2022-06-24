@@ -8,6 +8,8 @@ https://bp.bleb.li/documentation/python
 """
 
 import os
+import tempfile
+import webbrowser
 from functools import reduce
 from typing import Union, List
 from uuid import uuid4
@@ -363,12 +365,20 @@ class Babyplot(object):
 
     def __repr__(self) -> str:
         """If not running in a notebook, create a window with the babyplots visualization."""
-        import webview
-        
-        output = self.as_html(standalone=True)
+        if (is_notebook()):
+            return self._repr_html_()
 
-        webview.create_window("babyplots", html=output)
-        webview.start(gui="qt")
+        print('creating temporary file')
+        output = self.as_html(standalone=True, fullscreen=True)
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        path = f'{tmp.name}.html'
+
+        with open(path, 'w', encoding="utf-8") as htmlout:
+            htmlout.write(output)
+        
+        print('opening temporary file in webbrowser')
+        webbrowser.open(f'file://{path}', new=1)
+
         return "<babyplots visualization with {} plot(s)>".format(len(self.plots))
 
     def _repr_html_(self):
