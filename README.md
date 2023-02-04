@@ -69,16 +69,18 @@ Using babyplots will always be free for everybody. But if you really like it and
 
 ## Also see:
 
+* [babyplots_lib](https://github.com/derpylz/babyplots), the underlying javascript library
+* Babyplots as an [R package](https://bitbucket.org/derpylz/babyplots)
+
 Libraries used in babyplots:
 
-* [babyplots_lib](https://github.com/derpylz/babyplots), the underlying javascript library
 * [Babylon.js](https://www.babylonjs.com/), the rendering engine
 * [Chroma.js](https://gka.github.io/chroma.js/), the color conversion library
 * [CCapture.js](https://github.com/spite/ccapture.js/), for capturing gifs
 
 ## Author
 
-Babyplots was created by [Nils Trost](http://nils.blebli.de)
+Babyplots was created by [Nils Trost](https://github.com/derpylz)
 
 ## License
 

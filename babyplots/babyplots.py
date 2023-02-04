@@ -127,7 +127,7 @@ class Babyplot(object):
         ---
         coordinates: The coordinates of the data points (list or numpy ndarray).
 
-        plot_tyes: Either "pointCloud", "shapeCloud", "heatMap", "surface", or
+        plot_type: Either "pointCloud", "shapeCloud", "heatMap", "surface", or
         "line".
 
         color_by: Either "categories", "values", or "direct".
@@ -179,7 +179,7 @@ class Babyplot(object):
         dataframe: The pandas dataframe from which to take the coordinates for
         the plot and optionally a column for the color variable.
 
-        plot_tyes: Either "pointCloud", "shapeCloud", "heatMap", "surface", or
+        plot_type: Either "pointCloud", "shapeCloud", "heatMap", "surface", or
         "line".
 
         color_by: Either "categories", "values", or "direct".
